@@ -5,7 +5,7 @@
 
 using namespace std;
 
-int main() {
+int main(int argc, char **argv) {
 	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);

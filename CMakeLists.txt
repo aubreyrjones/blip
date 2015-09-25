@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(blip)
 
 # C++11 and some fairly ubiquitous vector extensions
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -ffast-math -mavx -mavx2 -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -g -Wall -ffast-math -mavx -mavx2 -msse2")
 
 #========================
 #      Third Party
@@ -27,18 +27,40 @@ set(BUILD_PYTHON OFF CACHE BOOL "Build PyRtAudio python bindings")
 set(BUILD_TESTING OFF CACHE BOOL "build rtaudio tests")
 add_subdirectory(rtaudio)
 
+set(DSP_FILTERS_SOURCE_FILES
+        DSPFilters/shared/DSPFilters/source/Bessel.cpp
+        DSPFilters/shared/DSPFilters/source/Biquad.cpp
+        DSPFilters/shared/DSPFilters/source/Butterworth.cpp
+        DSPFilters/shared/DSPFilters/source/Cascade.cpp
+        DSPFilters/shared/DSPFilters/source/ChebyshevI.cpp
+        DSPFilters/shared/DSPFilters/source/ChebyshevII.cpp
+        DSPFilters/shared/DSPFilters/source/Custom.cpp
+        DSPFilters/shared/DSPFilters/source/Design.cpp
+        DSPFilters/shared/DSPFilters/source/Elliptic.cpp
+        DSPFilters/shared/DSPFilters/source/Filter.cpp
+        DSPFilters/shared/DSPFilters/source/Legendre.cpp
+        DSPFilters/shared/DSPFilters/source/Param.cpp
+        DSPFilters/shared/DSPFilters/source/PoleFilter.cpp
+        DSPFilters/shared/DSPFilters/source/RBJ.cpp
+        DSPFilters/shared/DSPFilters/source/RootFinder.cpp
+        DSPFilters/shared/DSPFilters/source/State.cpp)
+
 
 #========================
 #      Build Blip
 #========================
 
+include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/include)
+
+
 set(SOURCE_FILES
         main.cpp
-        glad.c)
+        glad.c WavReader.cpp WavReader.h LocklessRing.h)
 
-include_directories(glm include glfw/include)
 
-add_executable(blip ${SOURCE_FILES})
+add_executable(blip
+        ${SOURCE_FILES}
+        ${DSP_FILTERS_SOURCE_FILES})
 
 if(UNIX)
         set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama)

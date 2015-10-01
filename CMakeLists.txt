@@ -46,6 +46,7 @@ set(DSP_FILTERS_SOURCE_FILES
         DSPFilters/shared/DSPFilters/source/State.cpp)
 
 
+
 #========================
 #      Build Blip
 #========================
@@ -54,9 +55,7 @@ include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/includ
 
 # resources
 
-set(RESOURCE_FILES
-        README.md
-        src/LocklessRing.h)
+file(GLOB RESOURCE_FILES ${CMAKE_SOURCE_DIR}/assets/*)
 
 add_custom_command(OUTPUT "assets.h" "assets.cpp"
         COMMAND "python" ARGS ${CMAKE_SOURCE_DIR}/resc "--outdir" ${CMAKE_BINARY_DIR} "assets" ${RESOURCE_FILES}

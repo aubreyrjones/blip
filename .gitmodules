@@ -10,3 +10,6 @@
 [submodule "DSPFilters"]
 	path = DSPFilters
 	url = https://github.com/vinniefalco/DSPFilters.git
+[submodule "Maximilian"]
+	path = Maximilian
+	url = git@github.com:aubreyrjones/Maximilian.git

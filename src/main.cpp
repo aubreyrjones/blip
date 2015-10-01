@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <iostream>
+#include <maximilian.h>
 
 int main(int argc, char **argv) {
 	glfwInit();
@@ -20,6 +19,7 @@ int main(int argc, char **argv) {
 	if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)){
 		return -1;
 	}
+
 
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();

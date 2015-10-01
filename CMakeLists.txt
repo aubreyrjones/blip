@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(blip)
 
 # C++11 and some fairly ubiquitous vector extensions
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -g -Wall -ffast-math -mavx -mavx2 -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Wno-unused-but-set-variable -ffast-math -mavx -mavx2 -msse2")
 
 #========================
 #      Third Party
@@ -45,13 +45,13 @@ set(DSP_FILTERS_SOURCE_FILES
         DSPFilters/shared/DSPFilters/source/RootFinder.cpp
         DSPFilters/shared/DSPFilters/source/State.cpp)
 
-
+set(MAXIMILIAN_SOURCE_FILES Maximilian/maximilian.h Maximilian/maximilian.cpp)
 
 #========================
 #      Build Blip
 #========================
 
-include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/include)
+include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/include Maximilian)
 
 # resources
 
@@ -76,7 +76,8 @@ set(SOURCE_FILES
 
 add_executable(blip
         ${SOURCE_FILES}
-        ${DSP_FILTERS_SOURCE_FILES})
+        ${DSP_FILTERS_SOURCE_FILES}
+        ${MAXIMILIAN_SOURCE_FILES})
 
 if (UNIX)
     set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama)

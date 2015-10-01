@@ -52,20 +52,37 @@ set(DSP_FILTERS_SOURCE_FILES
 
 include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/include)
 
+# resources
+
+set(RESOURCE_FILES
+        README.md
+        src/LocklessRing.h)
+
+add_custom_command(OUTPUT "assets.h" "assets.cpp"
+        COMMAND "python" ARGS ${CMAKE_SOURCE_DIR}/resc "--outdir" ${CMAKE_BINARY_DIR} "assets" ${RESOURCE_FILES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS ${CMAKE_SOURCE_DIR}/resc ${RESOURCE_FILES}
+        VERBATIM)
+
 
 set(SOURCE_FILES
-        main.cpp
-        glad.c WavReader.cpp WavReader.h LocklessRing.h)
+        src/main.cpp
+        src/glad.c
+        src/WavReader.cpp
+        src/WavReader.h
+        src/LocklessRing.h
+        ${CMAKE_BINARY_DIR}/assets.h
+        ${CMAKE_BINARY_DIR}/assets.cpp)
 
 
 add_executable(blip
         ${SOURCE_FILES}
         ${DSP_FILTERS_SOURCE_FILES})
 
-if(UNIX)
-        set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama)
+if (UNIX)
+    set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama)
 elseif(WIN32)
-        set(SYS_LIBS gdi32)
-endif()
+    set(SYS_LIBS gdi32)
+endif ()
 
 target_link_libraries(blip glfw rtaudio_static ${SYS_LIBS})

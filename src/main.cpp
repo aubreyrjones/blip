@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <maximilian.h>
+#include "WavReader.h"
 
 int main(int argc, char **argv) {
 	glfwInit();
@@ -20,6 +21,12 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+
+	WavReader wav(argv[0]);
+	if (!wav.initialize()){
+		std::cout << "Cannot read wave file." << std::endl;
+		return -1;
+	}
 
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();

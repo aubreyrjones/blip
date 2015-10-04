@@ -13,3 +13,6 @@
 [submodule "Maximilian"]
 	path = Maximilian
 	url = git@github.com:aubreyrjones/Maximilian.git
+[submodule "cpp-mmf"]
+	path = cpp-mmf
+	url = https://github.com/carlomilanesi/cpp-mmf.git

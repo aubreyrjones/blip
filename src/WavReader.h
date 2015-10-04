@@ -7,17 +7,22 @@
 
 #include <cstdint>
 #include <functional>
+#include <memory_mapped_file.hpp>
 
 struct _WavChunkHeader {
-	uint8_t chunkID [4];
+	uint32_t chunkID;
 	uint32_t chunkSize;
 };
 
 struct _WavRiffChunkDescriptor {
-	uint8_t format_ [4];
+	_WavChunkHeader header;
+
+	uint32_t format_;
 };
 
 struct _WavFormatChunk {
+	_WavChunkHeader header;
+
 	uint32_t audioFormat;
 	uint32_t nChannels;
 	uint32_t sampleRate;
@@ -26,17 +31,18 @@ struct _WavFormatChunk {
 	uint32_t bitsPerSample;
 };
 
-
 class WavReader {
 public:
-	typedef std::function<size_t (uint8_t*, size_t)> ReadFunction;
-	typedef std::function<void (uint8_t*, size_t)> SinkFunction;
-
 protected:
-	ReadFunction _read;
+	memory_mapped_file::read_only_mmf file;
+	size_t sampleCursor;
+
+	_WavFormatChunk format;
+	size_t nChannels;
+	size_t nSamplesInFile;
 
 public:
-	WavReader(ReadFunction reader, SinkFunction ) : _read(reader) {}
+	WavReader(std::string const& filepath) : file(filepath.c_str()) {}
 
 	bool initialize(); /// initialize, and return false if the file can't be parsed
 };

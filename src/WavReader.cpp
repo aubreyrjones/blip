@@ -16,23 +16,37 @@ bool WavReader::initialize() {
 
 	_WavRiffChunkDescriptor const* riffHeader = reinterpret_cast<_WavRiffChunkDescriptor const*>(file.data());
 
-	if (riffHeader->header.chunkID != 'RIFF' || riffHeader->format_ != 'WAVE') {
+	if (riffHeader->header.chunkID != 'FFIR' || riffHeader->format != 'EVAW') {
+		std::cout << "Not 'RIFF' or not 'WAVE'." << std::endl;
 		return false;
 	}
 
+	_WavChunkHeader formatHeader = *reinterpret_cast<_WavChunkHeader const*>(&file.data()[sizeof(_WavRiffChunkDescriptor)]);
+
+	if (formatHeader.chunkID != ' tmf') {
+		std::cout << "Bad fmt_ chunk." << std::endl;
+		return false;
+	}
+
+
 	format = *reinterpret_cast<_WavFormatChunk const*>(file.data() + sizeof(_WavRiffChunkDescriptor));
 
-	if (format.audioFormat != 1) {
-		std::cout << "Only linear PCM supported right now." << std::endl;
+	if (format.audioFormat != 1 && format.audioFormat != 0xfffe) {
+		std::cout << "Only linear PCM supported right now. Got: " << format.audioFormat << std::endl;
+		return false;
 	}
 
-	if (format.bitsPerSample != 8){
-		std::cout << "Only 8-bit PCM supported right now." << std::endl;
+	if (format.audioFormat == 0xfffe && format.subFormat != 1) {
+		std::cout << "Unknown extended wav format: " << format.subFormat << std::endl;
+		return false;
 	}
 
-	_WavChunkHeader chunkHeader = *reinterpret_cast<_WavChunkHeader*>(file.data());
+	sampleCursor =
+			sizeof(_WavRiffChunkDescriptor) +
+					sizeof(_WavFormatChunk) +
+					sizeof(_WavChunkHeader);
 
-	sampleCursor = sizeof(_WavRiffChunkDescriptor) + sizeof(_WavFormatChunk) + sizeof(_WavChunkHeader);
+
 
 	return true;
 }

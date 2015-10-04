@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 	}
 
 
-	WavReader wav(argv[0]);
+	WavReader wav(argv[1]);
 	if (!wav.initialize()){
 		std::cout << "Cannot read wave file." << std::endl;
 		return -1;

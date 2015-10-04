@@ -17,18 +17,23 @@ struct _WavChunkHeader {
 struct _WavRiffChunkDescriptor {
 	_WavChunkHeader header;
 
-	uint32_t format_;
+	uint32_t format;
 };
 
 struct _WavFormatChunk {
 	_WavChunkHeader header;
 
-	uint32_t audioFormat;
-	uint32_t nChannels;
+	uint16_t audioFormat;
+	uint16_t nChannels;
 	uint32_t sampleRate;
 	uint32_t byteRate;
-	uint32_t blockAlign;
-	uint32_t bitsPerSample;
+	uint16_t blockAlign;
+	uint16_t bitsPerSample;
+	uint16_t extensionSize;
+	uint16_t nValidBits;
+	uint32_t speakerMask;
+	uint16_t subFormat;
+	uint8_t formatGUID[14];
 };
 
 class WavReader {

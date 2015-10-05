@@ -35,6 +35,10 @@ struct AudioPingPongBuffer {
 			onWrite()
 	{}
 
+	AudioPingPongBuffer(AudioPingPongBuffer & o) = delete;
+
+	~AudioPingPongBuffer() { delete front; delete back; }
+
 	void swap();
 };
 

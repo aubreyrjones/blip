@@ -64,6 +64,7 @@ int AudioTransport::audioCallback(double *outputBuffer, double *, unsigned int n
 
 	if (!toDelete.empty()){
 		for (auto it : toDelete) {
+			delete *it;
 			sourceBuffers.erase(it);
 		}
 	}

@@ -46,26 +46,35 @@ bool WavReader::initialize() {
 		format.audioFormat = format.subFormat;
 	}
 
-	offset += sizeof(_WavFormatChunk);
+	offset += format.header.chunkSize + sizeof(_WavChunkHeader);
 
 	_WavChunkHeader dataHeader = *reinterpret_cast<_WavChunkHeader const*>(file.data() + offset);
 
-	frameCursor =
-			sizeof(_WavRiffChunkDescriptor) +
-					sizeof(_WavFormatChunk) +
-					sizeof(_WavChunkHeader);
+	offset += sizeof(_WavChunkHeader);
+
+	sampleCursor = offset;
+	std::cout << "data offset: " << frameCursor << std::endl;
 
 	bytesPerChannel = (size_t) glm::ceil(format.bitsPerSample / 8.0f);
 	bytesPerFrame = format.nChannels * bytesPerChannel;
 	framesInFile = dataHeader.chunkSize / bytesPerFrame;
 
+	std::cout << "nChannels: " << format.nChannels << std::endl;
+	std::cout << "byte alignment: " << format.blockAlign << std::endl;
+	std::cout << "Sample rate: " << format.sampleRate << std::endl;
+	std::cout << "bpc: " << bytesPerChannel << std::endl;
+	std::cout << "bpf: " << bytesPerFrame << std::endl;
+	std::cout << "filesize (bytes): " << file.file_size() << std::endl;
+
 	return true;
 }
 
 size_t WavReader::readAndConvertSamples(double *buffer, size_t nFrames) {
-	if (frameCursor + nFrames > framesInFile) {
+	if (frameCursor + nFrames > file.file_size()) {
 		nFrames = framesInFile - frameCursor;
 	}
+
+	if (!nFrames) return 0;
 
 	if (format.audioFormat == 1){
 		if (bytesPerChannel == 1){
@@ -76,10 +85,10 @@ size_t WavReader::readAndConvertSamples(double *buffer, size_t nFrames) {
 		}
 	}
 
-
 	return nFrames;
 }
 
 void WavReader::advanceFrame() {
-	frameCursor += bytesPerFrame;
+	frameCursor++;
+	sampleCursor += bytesPerFrame;
 }

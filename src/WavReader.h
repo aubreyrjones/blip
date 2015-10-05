@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <functional>
 #include <memory_mapped_file.hpp>
+#include <limits>
 
 struct _WavChunkHeader {
 	uint32_t chunkID;
@@ -54,29 +55,30 @@ inline double convert_sample(double const& s) {
 
 template <>
 inline double convert_sample(uint8_t const& s) {
-	return 128 - s;
+	return (s - 128.0) / 128.0;
 }
 
 template <>
 inline double convert_sample(uint16_t const& s) {
-	return 32768 - s;
+	return (s - 32768.0) / 32768.0;
 }
 
 template <>
 inline double convert_sample(int8_t const& s) {
-	return (double) s;
+	return (double) s / 128.0;
 }
 
 template <>
 inline double convert_sample(int16_t const& s) {
-	return (double) s;
+	return (double) s / 32768.0;
 }
 
 class WavReader {
 public:
 protected:
 	memory_mapped_file::read_only_mmf file;
-	size_t frameCursor;
+	size_t frameCursor = 0;
+	size_t sampleCursor;
 
 	_WavFormatChunk format;
 	size_t bytesPerChannel;
@@ -87,13 +89,14 @@ protected:
 
 	template <typename SAMPLE>
 	SAMPLE s(size_t channel) {
-		return *(reinterpret_cast<SAMPLE const*>(file.data() + frameCursor) + channel);
+		SAMPLE const* f = reinterpret_cast<SAMPLE const*>(file.data() + sampleCursor);
+		return *(f + channel);
 	}
 
 	template <typename SAMPLE>
 	void fill_frame(double *out) {
-		out[0] = convert_sample<SAMPLE>(s<SAMPLE>(0));
-		out[1] = convert_sample<SAMPLE>(s<SAMPLE>(1));
+		out[0] += convert_sample(s<SAMPLE>(0));
+		out[1] += convert_sample(s<SAMPLE>(1));
 	}
 
 	template <typename SAMPLE>

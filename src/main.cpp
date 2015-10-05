@@ -35,6 +35,7 @@ int main(int argc, char **argv) {
 		return wav.readAndConvertSamples(buf, nFrames);
 	});
 
+	dac.start();
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();
 

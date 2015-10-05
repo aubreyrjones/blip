@@ -25,8 +25,6 @@ AudioTransport::AudioTransport() :
 	streamParams.nChannels = 2;
 	streamParams.firstChannel = 0;
 
-	std::cout << streamParams.deviceId << std::endl;
-
 	unsigned int bufferSize = 1024;
 
 	rtaudio.openStream(&streamParams, nullptr, RTAUDIO_FLOAT64, 44100, &bufferSize, _rt_audio_callback, this, nullptr);
@@ -42,7 +40,7 @@ int AudioTransport::audioCallback(double *outputBuffer, double *, unsigned int n
 		s(outputBuffer, nFrames);
 	}
 
-	return nFrames;
+	return 0;
 }
 
 void AudioTransport::start() {

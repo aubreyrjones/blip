@@ -1,7 +1,9 @@
+#include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <maximilian.h>
+#include "AudioTransport.h"
 #include "WavReader.h"
+
 
 int main(int argc, char **argv) {
 	glfwInit();
@@ -21,12 +23,17 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
+	AudioTransport dac;
 
 	WavReader wav(argv[1]);
 	if (!wav.initialize()){
 		std::cout << "Cannot read wave file." << std::endl;
 		return -1;
 	}
+
+	dac.addSource([&wav](double* buf, size_t nFrames) -> size_t {
+		return wav.readAndConvertSamples(buf, nFrames);
+	});
 
 	while (!glfwWindowShouldClose(window)){
 		glfwPollEvents();

@@ -23,10 +23,6 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "build glfw docs")
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "build glfw tests")
 add_subdirectory(glfw)
 
-set(BUILD_PYTHON OFF CACHE BOOL "Build PyRtAudio python bindings")
-set(BUILD_TESTING OFF CACHE BOOL "build rtaudio tests")
-add_subdirectory(rtaudio)
-
 set(DSP_FILTERS_SOURCE_FILES
         DSPFilters/shared/DSPFilters/source/Bessel.cpp
         DSPFilters/shared/DSPFilters/source/Biquad.cpp
@@ -44,8 +40,12 @@ set(DSP_FILTERS_SOURCE_FILES
         DSPFilters/shared/DSPFilters/source/RBJ.cpp
         DSPFilters/shared/DSPFilters/source/RootFinder.cpp
         DSPFilters/shared/DSPFilters/source/State.cpp)
-
+if(UNIX)
+    add_definitions(-D__LINUX_PULSE__)
+endif()
 set(MAXIMILIAN_SOURCE_FILES Maximilian/maximilian.h Maximilian/maximilian.cpp)
+
+set(RTAUDIO_SOURCE_FILES rtaudio/RtAudio.cpp rtaudio/RtAudio.h)
 
 set(CPP_MMF_SOURCE_FILES
         cpp-mmf/memory_mapped_file.hpp
@@ -55,7 +55,7 @@ set(CPP_MMF_SOURCE_FILES
 #      Build Blip
 #========================
 
-include_directories(glm include glfw/include DSPFilters/shared/DSPFilters/include Maximilian cpp-mmf)
+include_directories(glm include rtaudio glfw/include DSPFilters/shared/DSPFilters/include Maximilian cpp-mmf)
 
 # resources
 
@@ -75,19 +75,23 @@ set(SOURCE_FILES
         src/WavReader.h
         src/LocklessRing.h
         ${CMAKE_BINARY_DIR}/assets.h
-        ${CMAKE_BINARY_DIR}/assets.cpp)
+        ${CMAKE_BINARY_DIR}/assets.cpp
+        src/AudioTransport.cpp
+        src/AudioTransport.h
+        ${RTAUDIO_SOURCE_FILES})
 
 
 add_executable(blip
-        ${SOURCE_FILES}
-        ${DSP_FILTERS_SOURCE_FILES}
-        ${MAXIMILIAN_SOURCE_FILES}
-        ${CPP_MMF_SOURCE_FILES})
+        ${RTAUDIO_SOURCE_FILES}
+#        ${DSP_FILTERS_SOURCE_FILES}
+#        ${MAXIMILIAN_SOURCE_FILES}
+        ${CPP_MMF_SOURCE_FILES}
+        ${SOURCE_FILES})
 
 if (UNIX)
-    set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama)
+    set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama asound pulse pulse-simple)
 elseif(WIN32)
     set(SYS_LIBS gdi32)
 endif ()
 
-target_link_libraries(blip glfw rtaudio_static ${SYS_LIBS})
+target_link_libraries(blip glfw ${SYS_LIBS})

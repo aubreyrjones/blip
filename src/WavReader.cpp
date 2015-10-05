@@ -6,6 +6,7 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
+
 bool WavReader::initialize() {
 	if (!file.is_open() || !file.data()) {
 		return false;
@@ -69,23 +70,33 @@ bool WavReader::initialize() {
 	return true;
 }
 
-size_t WavReader::readAndConvertSamples(double *buffer, size_t nFrames) {
+size_t WavReader::readAndConvertSamples(StereoFrame *buffer, size_t nFrames) {
+	size_t nFramesToSample = nFrames;
+
 	if (frameCursor + nFrames > file.file_size()) {
-		nFrames = framesInFile - frameCursor;
+		nFramesToSample = framesInFile - frameCursor;
 	}
 
-	if (!nFrames) return 0;
+	if (!nFramesToSample) return 2;
 
 	if (format.audioFormat == 1){
 		if (bytesPerChannel == 1){
-			fill_buffer<uint8_t>(buffer, nFrames);
+			fill_buffer<uint8_t>(buffer, nFramesToSample);
 		}
 		else if (bytesPerChannel == 2){
-			fill_buffer<int16_t>(buffer, nFrames);
+			fill_buffer<int16_t>(buffer, nFramesToSample);
 		}
 	}
 
-	return nFrames;
+	if (nFramesToSample < nFrames) {
+		for (StereoFrame *f = buffer + nFramesToSample; f < buffer + nFramesToSample; f++) {
+			f->l = 0;
+			f->r = 0;
+		}
+		return 1;
+	}
+
+	return 0;
 }
 
 void WavReader::advanceFrame() {

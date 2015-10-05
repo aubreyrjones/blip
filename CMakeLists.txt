@@ -78,7 +78,7 @@ set(SOURCE_FILES
         ${CMAKE_BINARY_DIR}/assets.cpp
         src/AudioTransport.cpp
         src/AudioTransport.h
-        ${RTAUDIO_SOURCE_FILES})
+        ${RTAUDIO_SOURCE_FILES} src/AudioTypes.h)
 
 
 add_executable(blip

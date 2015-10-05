@@ -9,6 +9,7 @@
 #include <functional>
 #include <memory_mapped_file.hpp>
 #include <limits>
+#include "AudioTypes.h"
 
 struct _WavChunkHeader {
 	uint32_t chunkID;
@@ -94,17 +95,17 @@ protected:
 	}
 
 	template <typename SAMPLE>
-	void fill_frame(double *out) {
-		out[0] += convert_sample(s<SAMPLE>(0));
-		out[1] += convert_sample(s<SAMPLE>(1));
+	void fill_frame(StereoFrame *out) {
+		out->l = convert_sample(s<SAMPLE>(0));
+		out->r = convert_sample(s<SAMPLE>(1));
 	}
 
 	template <typename SAMPLE>
-	void fill_buffer(double *out, size_t nFrames) {
+	void fill_buffer(StereoFrame *out, size_t nFrames) {
 		for (size_t i = 0; i < nFrames; i++) {
 			fill_frame<SAMPLE>(out);
 			advanceFrame();
-			out += 2;
+			out++;
 		}
 	}
 
@@ -113,7 +114,7 @@ public:
 
 	bool initialize(); /// initialize, and return false if the file can't be parsed
 
-	size_t readAndConvertSamples(double *buffer, size_t nFrames);
+	size_t readAndConvertSamples(StereoFrame *buffer, size_t nFrames);
 };
 
 #endif //BLIP_WAVREADER_H

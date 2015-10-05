@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	dac.addSource([&wav](double* buf, size_t nFrames) -> size_t {
+	dac.addSource([&wav](StereoFrame* buf, size_t nFrames) -> size_t {
 		return wav.readAndConvertSamples(buf, nFrames);
 	});
 

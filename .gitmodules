@@ -16,3 +16,6 @@
 [submodule "cpp-mmf"]
 	path = cpp-mmf
 	url = https://github.com/carlomilanesi/cpp-mmf.git
+[submodule "r8brain"]
+	path = r8brain
+	url = https://github.com/avaneev/r8brain-free-src.git

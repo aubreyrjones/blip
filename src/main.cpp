@@ -23,13 +23,13 @@ int main(int argc, char **argv) {
 		return -1;
 	}
 
-	AudioTransport dac;
-
 	WavReader wav(argv[1]);
 	if (!wav.initialize()){
 		std::cout << "Cannot read wave file." << std::endl;
 		return -1;
 	}
+
+	AudioTransport dac(wav.getSampleRate());
 
 	dac.addSource([&wav](StereoFrame* buf, size_t nFrames) -> size_t {
 		return wav.readAndConvertSamples(buf, nFrames);

@@ -10,7 +10,7 @@ cmake_minimum_required(VERSION 2.8.12)
 project(blip)
 
 # C++11 and some fairly ubiquitous vector extensions
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Wall -Wno-unused-but-set-variable -Wno-multichar -ffast-math -mavx -mavx2 -msse2")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -g -Os -Wall -Wno-unused-but-set-variable -Wno-multichar -ffast-math -mavx -mavx2 -msse2")
 
 #========================
 #      Third Party
@@ -51,11 +51,13 @@ set(CPP_MMF_SOURCE_FILES
         cpp-mmf/memory_mapped_file.hpp
         cpp-mmf/memory_mapped_file.cpp)
 
+set(R8BRAIN_SOURCE_FILES r8brain/r8bbase.cpp)
+
 #========================
 #      Build Blip
 #========================
 
-include_directories(glm include rtaudio glfw/include DSPFilters/shared/DSPFilters/include Maximilian cpp-mmf)
+include_directories(glm include rtaudio glfw/include DSPFilters/shared/DSPFilters/include Maximilian cpp-mmf r8brain)
 
 # resources
 
@@ -78,7 +80,8 @@ set(SOURCE_FILES
         ${CMAKE_BINARY_DIR}/assets.cpp
         src/AudioTransport.cpp
         src/AudioTransport.h
-        ${RTAUDIO_SOURCE_FILES} src/AudioTypes.h)
+        ${RTAUDIO_SOURCE_FILES}
+        src/AudioTypes.h src/Resampler.cpp src/Resampler.h)
 
 
 add_executable(blip
@@ -86,10 +89,11 @@ add_executable(blip
 #        ${DSP_FILTERS_SOURCE_FILES}
 #        ${MAXIMILIAN_SOURCE_FILES}
         ${CPP_MMF_SOURCE_FILES}
+        ${R8BRAIN_SOURCE_FILES}
         ${SOURCE_FILES})
 
 if (UNIX)
-    set(SYS_LIBS dl m pthread X11 Xcursor Xi Xxf86vm GL Xrandr Xinerama asound pulse pulse-simple)
+    set(SYS_LIBS dl m Xcursor Xi Xxf86vm Xrandr Xinerama X11 pulse-simple pulse pthread GL)
 elseif(WIN32)
     set(SYS_LIBS gdi32)
 endif ()

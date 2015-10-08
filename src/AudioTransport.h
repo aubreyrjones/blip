@@ -56,7 +56,7 @@ protected:
 
 public:
 
-	AudioTransport();
+	AudioTransport(uint32_t outputSampleRate);
 
 	void start();
 

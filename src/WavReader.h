@@ -112,9 +112,11 @@ protected:
 public:
 	WavReader(std::string const& filepath) : file(filepath.c_str()) {}
 
-	bool initialize(); /// initialize, and return false if the file can't be parsed
+	bool initialize(); ///< Read the WAV header, and return false if the file can't be parsed
 
-	size_t readAndConvertSamples(StereoFrame *buffer, size_t nFrames);
+	size_t readAndConvertSamples(StereoFrame *buffer, size_t nFrames); ///< read the next nFrames of stereo signal, return the number of frames read.
+
+	uint32_t getSampleRate();
 };
 
 #endif //BLIP_WAVREADER_H

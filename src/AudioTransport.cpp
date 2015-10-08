@@ -16,7 +16,7 @@ int _rt_audio_callback(void *outputBuffer, void *inputBuffer, unsigned int nFram
 }
 
 
-AudioTransport::AudioTransport() :
+AudioTransport::AudioTransport(uint32_t outputSampleRate) :
 	rtaudio()
 {
 	rtaudio.showWarnings(true);
@@ -26,15 +26,15 @@ AudioTransport::AudioTransport() :
 	streamParams.nChannels = 2;
 	streamParams.firstChannel = 0;
 
-	rtaudio.openStream(&streamParams, nullptr, RTAUDIO_FLOAT64, 44100, &bufferSize, _rt_audio_callback, this, nullptr);
+	rtaudio.openStream(&streamParams, nullptr, RTAUDIO_FLOAT64, outputSampleRate, &bufferSize, _rt_audio_callback, this, nullptr);
 }
+
 
 int AudioTransport::audioCallback(double *outputBuffer, double *, unsigned int nFrames, double streamTime, RtAudioStreamStatus status) {
 	StereoFrame *out = reinterpret_cast<StereoFrame*>(outputBuffer);
 
-
-	for (size_t i = 0; i < nFrames * 2; i++){ // * 2 for stereo
-		outputBuffer[i] = 0;
+	for (size_t i = 0; i < nFrames; i++){
+		out[i].zero();
 	}
 
 	std::vector<BufferList::iterator> toDelete;
@@ -48,8 +48,7 @@ int AudioTransport::audioCallback(double *outputBuffer, double *, unsigned int n
 		}
 
 		for (size_t i = 0; i < nFrames; i++) {
-			out[i].l += buf->front[i].l;
-			out[i].r += buf->front[i].r;
+			out[i] += buf->front[i];
 		}
 
 		buf->swap();
@@ -90,6 +89,7 @@ void AudioTransport::addSource(StereoSourceFunction sampleFunc) {
 	t.detach();
 }
 
+
 void threaded_fill(AudioPingPongBuffer *buffer, StereoSourceFunction source) {
 	std::cout << "Source launched." << std::endl;
 
@@ -98,7 +98,8 @@ void threaded_fill(AudioPingPongBuffer *buffer, StereoSourceFunction source) {
 
 		if (buffer->frontDirty.load(std::memory_order_acquire)) {
 
-			buffer->sourceStreamStatus = source(buffer->front, buffer->bufferSize);
+			buffer->sourceStreamStatus =
+					source(buffer->front, buffer->bufferSize);
 
 			buffer->frontDirty.store(false, std::memory_order_release);
 
@@ -112,6 +113,7 @@ void threaded_fill(AudioPingPongBuffer *buffer, StereoSourceFunction source) {
 
 	std::cout << "Source ended." << std::endl;
 }
+
 
 void AudioPingPongBuffer::swap() {
 	std::swap(front, back);

@@ -73,7 +73,7 @@ bool WavReader::initialize() {
 size_t WavReader::readAndConvertSamples(StereoFrame *buffer, size_t nFrames) {
 	size_t nFramesToSample = nFrames;
 
-	if (frameCursor + nFrames > file.file_size()) {
+	if (frameCursor + nFrames >= framesInFile) {
 		nFramesToSample = framesInFile - frameCursor;
 	}
 
@@ -102,4 +102,8 @@ size_t WavReader::readAndConvertSamples(StereoFrame *buffer, size_t nFrames) {
 void WavReader::advanceFrame() {
 	frameCursor++;
 	sampleCursor += bytesPerFrame;
+}
+
+uint32_t WavReader::getSampleRate() {
+	return format.sampleRate;
 }
